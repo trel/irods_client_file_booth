@@ -1,0 +1,33 @@
+[global]
+server.socket_host: '0.0.0.0'
+server.socket_port: 8000
+#environment: 'production'
+
+[/]
+tools.gzip.on: True
+
+[/app.css]
+tools.staticfile.on: True
+tools.staticfile.filename: "/app.css"
+
+[/favicon.ico]
+tools.staticfile.on: True
+tools.staticfile.filename: "/favicon.ico"
+
+[file_booth]
+#title = 'iRODS File Booth'
+#application_name = 'irods_client_file_booth'
+#custom_html_header = ''
+#custom_html_footer = ''
+#irods_host = 'host.docker.internal'
+irods_host = 'irods.example.org'
+irods_zone = 'tempZone'
+irods_port = 1247
+client_server_negotiation = 'request_server_negotiation'
+client_server_policy = 'CS_NEG_REFUSE'
+encryption_algorithm = 'AES-256-CBC'
+encryption_key_size = 32
+encryption_num_hash_rounds = 16
+encryption_salt_size = 8
+ssl_verify_server = 'cert'
+ssl_ca_certificate_file = '/ssl.crt'

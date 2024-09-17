@@ -1,0 +1,15 @@
+services:
+    file_booth:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - "8000:8000"
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        volumes:
+            - ./irods_fav.ico:/favicon.ico:ro
+            - ./app.css:/app.css:ro
+            - ./app.config:/app.config:ro
+            - ./app.py:/app.py:ro
+            - ./ssl.crt:/ssl.crt:ro
