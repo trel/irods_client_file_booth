@@ -147,9 +147,11 @@ class Root(object):
                         size += len(data)
 
                 ticket_expiry_in_seconds = 3600
+                ticket_uses_allowed = 3
                 new_ticket = Ticket(session)
                 new_ticket.issue('read', logical_path)
                 new_ticket.modify('expire', int( time.time() + int(ticket_expiry_in_seconds)))
+                new_ticket.modify('uses', int(ticket_uses_allowed))
                 html_body = '[{0}] -- success -- ticket[{1}]'.format(logical_path, new_ticket.string)
                 return html_header + html_body + html_footer
             except Exception as e:
