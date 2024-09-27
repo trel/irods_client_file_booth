@@ -1,6 +1,8 @@
 import cherrypy
 import ssl
+import time
 from irods.session import iRODSSession
+from irods.ticket import Ticket
 
 defaults = {
   'title': "iRODS File Booth",
@@ -144,7 +146,11 @@ class Root(object):
                         f.write(data)
                         size += len(data)
 
-                html_body = '[{0}] -- success'.format(logical_path)
+                ticket_expiry_in_seconds = 3600
+                new_ticket = Ticket(session)
+                new_ticket.issue('read', logical_path)
+                new_ticket.modify('expire', int( time.time() + int(ticket_expiry_in_seconds)))
+                html_body = '[{0}] -- success -- ticket[{1}]'.format(logical_path, new_ticket.string)
                 return html_header + html_body + html_footer
             except Exception as e:
                 html_body = repr(e)
