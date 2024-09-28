@@ -1,8 +1,17 @@
-import cherrypy
 import ssl
 import time
+from tempfile import NamedTemporaryFile
+
+import cherrypy
+from cherrypy.lib import static
+
+import irods.exception
+import irods.keywords as kw
+from irods.models import Collection, DataObject
 from irods.session import iRODSSession
 from irods.ticket import Ticket
+from tempfile import NamedTemporaryFile
+
 
 defaults = {
   'title': "iRODS File Booth",
@@ -109,9 +118,43 @@ class Root(object):
     def download(self, *args, **kwargs):
         if cherrypy.request.method != 'GET':
             return 'only GET supported'
-        # lookup logical_path via query
-        # get logical_path
-        # get bytes to client
+        config = merge_custom_into_default_config(cherrypy.request.app.config['file_booth'])
+        html_header = get_header(config)
+        html_footer = get_footer(config)
+        # arguments
+        ticket_string = kwargs.get('t')
+
+        # build session
+        ssl_settings = get_ssl_settings(config)
+        with iRODSSession(  host=config['irods_host'],
+                            port=config['irods_port'],
+                            zone=config['irods_zone'],
+                            user='anonymous',
+                            password='',
+                            application_name=config['application_name'],
+                            **ssl_settings) as session:
+            try:
+                # apply supplied ticket
+                Ticket(session, ticket_string).supply()
+                # query for the data object information
+                result = session.query(Collection.name, DataObject.name).one()
+                # build logical_path
+                logical_path = ( result[Collection.name] + '/' + result[DataObject.name] )
+                # use temporary file
+                with NamedTemporaryFile(delete_on_close=False) as tf:
+                    # get iRODS file to temporary file
+                    options = {}
+                    options["allow_redirect"] = False
+                    options[kw.FORCE_FLAG_KW] = ""
+                    session.data_objects.get(logical_path, tf.name, **options)
+                    # serve static file as attachment to browser
+                    return static.serve_file(tf.name,
+                                             'application/x-download',
+                                             'attachment',
+                                             result[DataObject.name])
+            except Exception as e:
+                html_body = repr(e)
+                return html_header + html_body + html_footer
 
     #https://stackoverflow.com/a/38998044
     @cherrypy.expose
