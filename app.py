@@ -102,34 +102,25 @@ class Root(object):
         html_header = get_header(config)
         html_footer = get_footer(config)
         html_body = '''\
-        <p>
-        <form method="post" action="upload" enctype="multipart/form-data">
         <table border=0 align=center>
-        <tr><td colspan=2><center><h1>Upload</h1></center></td></tr>
-        <tr><td colspan=2><center><input type="file" name="filename"/></center></td></tr>
-        <tr><td colspan=2><center><button class="button" type="submit">Upload</button></center></td></tr>
+        <tr>
+           <form method="post" action="upload" enctype="multipart/form-data">
+           <td><input type="file" name="filename"/></td>
+           <td><button class="button" type="submit">Upload</button></td>
+           </form>
+        </tr>
+        <tr>
+           <form method="post" action="download">
+           <td><input type="text" id="t" name="t"/></td>
+           <td><button class="button" type="submit">Download</button></td>
+           </form>
+        </tr>
         </table>
-        </form>
-        </p>
-
-        <p>
-        <form method="post" action="download"">
-        <table border=0 align=center>
-        <tr><td colspan=2><center><h1>Download</h1></center></td></tr>
-        <tr><td colspan=2><center><input type="text" id="t" name="t"/></center></td></tr>
-        <tr><td colspan=2><center><button class="button" type="submit">Download</button></center></td></tr>
-        </table>
-        </form>
-        </p>
-
-
         '''
         return html_header + html_body + html_footer
 
     @cherrypy.expose
     def download(self, *args, **kwargs):
-#        if cherrypy.request.method != 'GET':
-#            return 'only GET supported'
         config = merge_custom_into_default_config(cherrypy.request.app.config['file_booth'])
         html_header = get_header(config)
         html_footer = get_footer(config)
