@@ -23,6 +23,7 @@ tools.staticfile.filename: "/favicon.ico"
 irods_host = 'irods.example.org'
 irods_zone = 'tempZone'
 irods_port = 1247
+upload_collection_prefix = 'home/public'
 client_server_negotiation = 'request_server_negotiation'
 client_server_policy = 'CS_NEG_REFUSE'
 encryption_algorithm = 'AES-256-CBC'

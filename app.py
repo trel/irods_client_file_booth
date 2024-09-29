@@ -16,6 +16,7 @@ from tempfile import NamedTemporaryFile
 defaults = {
   'title': "iRODS File Booth",
   'application_name': 'irods_client_file_booth',
+  'upload_collection_prefix': 'home/public',
   'custom_html_header': '',
   'custom_html_footer': "<p><a href='/'>Home</a> - <a href='/test'>test</a></p>",
   'ticket_uses_limit': 3,
@@ -183,7 +184,7 @@ class Root(object):
                             application_name=config['application_name'],
                             **ssl_settings) as session:
             try:
-                logical_path = '/{0.zone}/home/public/{1}'.format(session, uploaded_file.filename)
+                logical_path = '/{0.zone}/{1}/{2}'.format(session, config['upload_collection_prefix'].lstrip('/'), uploaded_file.filename)
                 size = 0
                 options = {}
                 options["allow_redirect"] = False
