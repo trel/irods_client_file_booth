@@ -31,3 +31,5 @@ encryption_num_hash_rounds = 16
 encryption_salt_size = 8
 ssl_verify_server = 'cert'
 ssl_ca_certificate_file = '/ssl.crt'
+ticket_uses_limit = 3
+ticket_expiry_in_seconds = 3600

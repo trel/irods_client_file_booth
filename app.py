@@ -17,7 +17,9 @@ defaults = {
   'title': "iRODS File Booth",
   'application_name': 'irods_client_file_booth',
   'custom_html_header': '',
-  'custom_html_footer': "<p><a href='/'>Home</a> - <a href='/test'>test</a></p>"
+  'custom_html_footer': "<p><a href='/'>Home</a> - <a href='/test'>test</a></p>",
+  'ticket_uses_limit': 3,
+  'ticket_expiry_in_seconds': 3600
 }
 
 def merge_custom_into_default_config(config):
@@ -71,6 +73,7 @@ class Root(object):
                             **ssl_settings) as session:
             try:
                 html_body = ""
+                html_body += '<br/>config [{}]'.format(config)
                 html_body += '<br/>session.pool.application_name [{}]'.format(session.pool.application_name)
                 html_body += '<br/>session.server_version [{}]'.format(session.server_version)
                 connections = session.pool.active | session.pool.idle
@@ -192,12 +195,10 @@ class Root(object):
                         f.write(data)
                         size += len(data)
 
-                ticket_expiry_in_seconds = 3600
-                ticket_uses_allowed = 3
                 new_ticket = Ticket(session)
                 new_ticket.issue('read', logical_path)
-                new_ticket.modify('expire', int( time.time() + int(ticket_expiry_in_seconds)))
-                new_ticket.modify('uses', int(ticket_uses_allowed))
+                new_ticket.modify('uses', int(config['ticket_uses_limit']))
+                new_ticket.modify('expire', int( time.time() + int(config['ticket_expiry_in_seconds'])))
                 html_body = 'Your file is available at: {0}/download?t={1}'.format(cherrypy.request.base, new_ticket.string)
                 return html_header + html_body + html_footer
             except Exception as e:
